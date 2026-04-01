@@ -5,9 +5,9 @@
 replicaCount: 2
 
 image:
-  repository: ghcr.io/brix-org/brix-web
+  repository: jonasaugust12/brix-web
   # -- Always pin to a specific version in prod
-  tag: "v1.0.0"
+  tag: "prod-3c33540"
   pullPolicy: IfNotPresent
 
 service:
