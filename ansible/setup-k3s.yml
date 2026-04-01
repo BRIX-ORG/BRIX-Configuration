@@ -60,5 +60,13 @@
         src: ../root-app.yaml
         dest: /tmp/root-app.yaml
 
+    - name: Copy ArgoCD Ingress to server
+      copy:
+        src: ./argocd-ingress.yaml
+        dest: /tmp/argocd-ingress.yaml
+
     - name: Deploy the ArgoCD Root Application
       shell: k3s kubectl apply -f /tmp/root-app.yaml
+
+    - name: Deploy the ArgoCD Ingress
+      shell: k3s kubectl apply -f /tmp/argocd-ingress.yaml

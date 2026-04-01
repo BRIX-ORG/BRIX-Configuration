@@ -1,0 +1,33 @@
+# ============================================
+# ArgoCD Server Ingress (Traefik)
+# ============================================
+# Exposes ArgoCD Web UI at: https://argocd.brix.social
+# Applied once during cluster setup via Ansible.
+# ============================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server-ingress
+  namespace: argocd
+  annotations:
+    # -- Traefik entrypoint: web (HTTP, port 80)
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # -- Tell Traefik to forward to ArgoCD HTTPS backend without re-encrypting
+    traefik.ingress.kubernetes.io/router.middlewares: ""
+    # -- ArgoCD server runs HTTPS internally; tell Traefik to use HTTPS backend
+    ingress.kubernetes.io/ssl-passthrough: "true"
+    # -- Disable HTTPS redirect so ArgoCD handles its own TLS
+    traefik.ingress.kubernetes.io/router.tls: "false"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: argocd.brix.social
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
