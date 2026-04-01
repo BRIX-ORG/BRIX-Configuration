@@ -2,6 +2,10 @@
 # PostgreSQL - PROD Environment (Bitnami Chart)
 # ============================================
 
+image:
+  repository: bitnami/postgresql
+  tag: 17
+
 auth:
   postgresPassword: "brix_password"
   username: "brix_user"
@@ -47,6 +51,9 @@ backup:
 
 metrics:
   enabled: true
+  image:
+    repository: bitnami/postgres-exporter
+    tag: latest
   resources:
     requests:
       cpu: 50m

@@ -1,13 +1,19 @@
 # ============================================
 # PostgreSQL - DEV Environment (Bitnami Chart)
 # ============================================
-# Chart: https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+
+image:
+  repository: bitnami/postgresql
+  tag: 17
 
 auth:
   postgresPassword: "brix_password"
   username: "brix_user"
   password: "brix_password"
   database: "brix_db"
+
+# -- Disable replication for dev
+architecture: standalone
 
 primary:
   persistence:
@@ -24,8 +30,8 @@ primary:
       cpu: 500m
       memory: 512Mi
 
-# -- Disable replication for dev
-architecture: standalone
-
 metrics:
   enabled: false
+  image:
+    repository: bitnami/postgres-exporter
+    tag: latest
