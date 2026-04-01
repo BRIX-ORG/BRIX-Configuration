@@ -4,8 +4,9 @@
 # Chart: https://github.com/bitnami/charts/tree/main/bitnami/redis
 
 image:
-  repository: bitnami/redis
-  tag: 7.4
+  registry: docker.io
+  repository: bitnamilegacy/redis
+  tag: 7.4.2-debian-12-r4
 
 # -- Disable auth for dev simplicity
 auth:
@@ -31,5 +32,5 @@ master:
 metrics:
   enabled: false
   image:
-    repository: bitnami/redis-exporter
+    repository: bitnamilegacy/redis-exporter
     tag: latest

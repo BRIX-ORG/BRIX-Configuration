@@ -3,8 +3,9 @@
 # ============================================
 
 image:
-  repository: bitnami/redis
-  tag: 7.4
+  registry: docker.io
+  repository: bitnamilegacy/redis
+  tag: 7.4.2-debian-12-r4
 
 auth:
   enabled: false
@@ -44,7 +45,7 @@ replica:
 metrics:
   enabled: true
   image:
-    repository: bitnami/redis-exporter
+    repository: bitnamilegacy/redis-exporter
     tag: latest
   resources:
     requests:

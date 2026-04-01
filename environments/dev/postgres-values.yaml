@@ -3,8 +3,9 @@
 # ============================================
 
 image:
-  repository: bitnami/postgresql
-  tag: 17
+  registry: docker.io
+  repository: bitnamilegacy/postgresql
+  tag: 17.2.0-debian-12-r5
 
 auth:
   postgresPassword: "brix_password"
@@ -33,5 +34,5 @@ primary:
 metrics:
   enabled: false
   image:
-    repository: bitnami/postgres-exporter
+    repository: bitnamilegacy/postgres-exporter
     tag: latest
