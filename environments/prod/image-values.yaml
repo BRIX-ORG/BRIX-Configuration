@@ -9,6 +9,20 @@ image:
   tag: "prod-654e1c5"
   pullPolicy: IfNotPresent
 
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 120
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
 service:
   type: ClusterIP
   port: 5000
