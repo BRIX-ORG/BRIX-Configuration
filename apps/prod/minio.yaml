@@ -1,6 +1,6 @@
 # ============================================
 # ArgoCD Application - MinIO (PROD)
-# Uses Bitnami Helm chart
+# Uses Bitnami Helm chart + multi-source for values
 # ============================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -14,15 +14,19 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: brix-prod
-  source:
-    repoURL: https://charts.bitnami.com/bitnami
-    chart: minio
-    targetRevision: 14.*.*
-    helm:
-      releaseName: brix-minio
-      valueFiles: []
-      values: |
-        {{- .Files.Get "../../environments/prod/minio-values.yaml" }}
+  sources:
+    # -- Git repo containing our values files
+    - repoURL: https://github.com/BRIX-ORG/BRIX-Configuration.git
+      targetRevision: main
+      ref: values
+    # -- Bitnami Helm chart
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: minio
+      targetRevision: 14.*.*
+      helm:
+        releaseName: brix-minio
+        valueFiles:
+          - $values/environments/prod/minio-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: brix-prod

@@ -19,19 +19,22 @@ ingress:
   enabled: true
   className: traefik
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    # -- Uncomment if using cert-manager
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # -- TODO: Uncomment below when SSL is configured
+    # traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    # traefik.ingress.kubernetes.io/router.tls: "true"
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: brix.social
       paths:
         - path: /
           pathType: Prefix
-  tls:
-    - secretName: brix-fe-tls
-      hosts:
-        - brix.social
+  tls: []
+  # -- TODO: Uncomment below when SSL is configured
+  # tls:
+  #   - secretName: brix-fe-tls
+  #     hosts:
+  #       - brix.social
 
 resources:
   requests:

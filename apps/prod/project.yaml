@@ -1,16 +1,19 @@
 # ============================================
-# ArgoCD AppProject - DEV
+# ArgoCD AppProject - PROD
+# ============================================
+# This file is placed in apps/prod/ so the root
+# app-of-apps automatically creates the project.
 # ============================================
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: brix-dev
+  name: brix-prod
   namespace: argocd
   labels:
     app.kubernetes.io/part-of: brix
-    environment: dev
+    environment: prod
 spec:
-  description: BRIX Platform - Development Environment
+  description: BRIX Platform - Production Environment
 
   # -- Source repos allowed
   sourceRepos:
@@ -20,13 +23,13 @@ spec:
   # -- Destination clusters/namespaces allowed
   destinations:
     - server: https://kubernetes.default.svc
-      namespace: brix-dev
+      namespace: brix-prod
 
   # -- Allow all resource types
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
 
-  # -- Allow orphaned resources (Bitnami charts create extra resources)
+  # -- Strict orphaned resource monitoring in prod
   orphanedResources:
     warn: true

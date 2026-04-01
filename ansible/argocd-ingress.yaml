@@ -1,8 +1,8 @@
 # ============================================
 # ArgoCD Server Ingress (Traefik)
 # ============================================
-# Exposes ArgoCD Web UI at: https://argocd.brix.social
-# Applied once during cluster setup via Ansible.
+# Exposes ArgoCD Web UI at: http://argocd.brix.social
+# -- TODO: Update to https:// when SSL is configured
 # ============================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
