@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/brix-org/brix-web
-  tag: "dev-latest"
+  repository: jonasaugust12/brix-web
+  tag: "dev-7d62ed9"
   pullPolicy: Always
 
 service:
