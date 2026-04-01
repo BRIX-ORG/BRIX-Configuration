@@ -1,0 +1,68 @@
+---
+# ============================================
+# Play 1: Retrieve K3s join token from Master
+# ============================================
+- name: Retrieve K3s join token from Master
+  hosts: k3s_master
+  become: yes
+  tasks:
+    - name: Read K3s node token
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: k3s_token_raw
+
+    - name: Store token as fact
+      set_fact:
+        k3s_token: "{{ k3s_token_raw.content | b64decode | trim }}"
+
+# ============================================
+# Play 2: Install K3s Agent on Worker(s)
+# ============================================
+- name: Join Worker(s) to K3s Cluster
+  hosts: k3s_worker
+  become: yes
+  vars:
+    k3s_version: "v1.30.2+k3s1"
+  tasks:
+    - name: Wait for server to finish booting
+      wait_for_connection:
+        timeout: 300
+
+    - name: Ensure curl is installed
+      apt:
+        name: curl
+        state: present
+        update_cache: yes
+
+    - name: Install K3s Agent
+      shell: >
+        curl -sfL https://get.k3s.io |
+        INSTALL_K3S_VERSION="{{ k3s_version }}"
+        K3S_URL="https://{{ master_private_ip }}:6443"
+        K3S_TOKEN="{{ hostvars[groups['k3s_master'][0]].k3s_token }}"
+        sh -s - agent --node-name "{{ inventory_hostname }}"
+      args:
+        creates: /etc/systemd/system/k3s-agent.service
+
+# ============================================
+# Play 3: Verify cluster status on Master
+# ============================================
+- name: Verify cluster status
+  hosts: k3s_master
+  become: yes
+  tasks:
+    - name: Wait for worker(s) to join
+      shell: k3s kubectl get nodes | grep "{{ item }}" | grep " Ready"
+      register: node_ready
+      until: node_ready.rc == 0
+      retries: 20
+      delay: 10
+      loop: "{{ groups['k3s_worker'] }}"
+
+    - name: Display cluster status
+      shell: k3s kubectl get nodes -o wide
+      register: cluster_status
+
+    - name: Show cluster nodes
+      debug:
+        msg: "{{ cluster_status.stdout_lines }}"

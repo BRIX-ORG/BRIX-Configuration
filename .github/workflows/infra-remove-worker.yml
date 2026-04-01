@@ -1,0 +1,86 @@
+name: infrastructure-remove-worker
+on:
+  workflow_dispatch:
+
+jobs:
+  remove-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '~1.10'
+          terraform_wrapper: false
+
+      - name: Terraform Init (Workers)
+        run: terraform init
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get Current Worker Count
+        id: current
+        run: |
+          COUNT=$(terraform output -raw worker_count 2>/dev/null || echo "0")
+          echo "count=${COUNT}" >> $GITHUB_OUTPUT
+          if [ "${COUNT}" = "0" ]; then
+            echo "❌ No workers to remove!"
+            exit 1
+          fi
+          echo "📊 Current worker count: ${COUNT}"
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get Master IP
+        id: tf-output
+        run: |
+          MASTER_PUBLIC_IP=$(terraform output -raw master_public_ip)
+          echo "master_public_ip=${MASTER_PUBLIC_IP}" >> $GITHUB_OUTPUT
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Configure SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Drain and Remove Last Worker from K3s
+        run: |
+          WORKER_NAME="brix-k3s-worker-${{ steps.current.outputs.count }}"
+          echo "🔄 Draining node: ${WORKER_NAME}"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa \
+            ubuntu@${{ steps.tf-output.outputs.master_public_ip }} \
+            "sudo k3s kubectl drain ${WORKER_NAME} --ignore-daemonsets --delete-emptydir-data --timeout=120s || true"
+          echo "🗑️ Deleting node from cluster: ${WORKER_NAME}"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa \
+            ubuntu@${{ steps.tf-output.outputs.master_public_ip }} \
+            "sudo k3s kubectl delete node ${WORKER_NAME} || true"
+
+      - name: Destroy Worker Instance
+        id: destroy
+        run: |
+          NEW_COUNT=$(( ${{ steps.current.outputs.count }} - 1 ))
+          echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
+          terraform apply -var="worker_count=${NEW_COUNT}" -auto-approve
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Summary
+        run: |
+          echo "## 🗑️ Worker Node Removed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Removed | \`brix-k3s-worker-${{ steps.current.outputs.count }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Remaining Workers | ${{ steps.destroy.outputs.new_count }} |" >> $GITHUB_STEP_SUMMARY

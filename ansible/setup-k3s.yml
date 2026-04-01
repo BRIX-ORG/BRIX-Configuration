@@ -46,6 +46,21 @@
         - brix-prod
       when: lookup('env', 'DOCKERHUB_USERNAME') != ""
 
+    - name: Ensure ArgoCD namespace exists
+      shell: k3s kubectl create namespace argocd --dry-run=client -o yaml | k3s kubectl apply -f -
+
+    - name: Install ArgoCD
+      shell: k3s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --server-side --force-conflicts
+
+    - name: Wait for ArgoCD server deployment to be available
+      shell: k3s kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
+
+    - name: Disable ArgoCD internal TLS (serve HTTP only)
+      shell: |
+        k3s kubectl -n argocd patch configmap argocd-cmd-params-cm --type merge -p '{"data":{"server.insecure":"true"}}'
+        k3s kubectl -n argocd rollout restart deployment argocd-server
+        k3s kubectl -n argocd rollout status deployment argocd-server --timeout=120s
+
     - name: Add GitHub PAT Secret for ArgoCD (Private Repository Access)
       shell: |
         cat <<EOF | k3s kubectl apply -f -

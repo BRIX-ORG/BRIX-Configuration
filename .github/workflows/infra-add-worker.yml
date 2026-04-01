@@ -1,0 +1,110 @@
+name: infrastructure-add-worker
+on:
+  workflow_dispatch:
+
+jobs:
+  add-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '~1.10'
+          terraform_wrapper: false
+
+      - name: Terraform Init (Workers)
+        run: terraform init
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get Current Worker Count
+        id: current
+        run: |
+          COUNT=$(terraform output -raw worker_count 2>/dev/null || echo "0")
+          echo "count=${COUNT}" >> $GITHUB_OUTPUT
+          echo "📊 Current worker count: ${COUNT}"
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Create New Worker
+        id: create
+        run: |
+          NEW_COUNT=$(( ${{ steps.current.outputs.count }} + 1 ))
+          echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
+          echo "🚀 Creating worker ${NEW_COUNT}..."
+          terraform apply -var="worker_count=${NEW_COUNT}" -auto-approve
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get Worker Details
+        id: tf-output
+        run: |
+          MASTER_PUBLIC_IP=$(terraform output -raw master_public_ip)
+          MASTER_PRIVATE_IP=$(terraform output -raw master_private_ip)
+          echo "master_public_ip=${MASTER_PUBLIC_IP}" >> $GITHUB_OUTPUT
+          echo "master_private_ip=${MASTER_PRIVATE_IP}" >> $GITHUB_OUTPUT
+
+          WORKER_IPS=$(terraform output -json worker_public_ips | jq -r '.[]')
+          echo "worker_ips<<EOF" >> $GITHUB_OUTPUT
+          echo "${WORKER_IPS}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        working-directory: ./terraform/workers
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Configure SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Generate Ansible Inventory
+        run: |
+          cat > ansible/inventory-workers.ini << EOF
+          [k3s_master]
+          master ansible_host=${{ steps.tf-output.outputs.master_public_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+          [k3s_worker]
+          EOF
+
+          INDEX=1
+          while IFS= read -r IP; do
+            [ -z "$IP" ] && continue
+            echo "brix-k3s-worker-${INDEX} ansible_host=${IP} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory-workers.ini
+            INDEX=$((INDEX + 1))
+          done <<< "${{ steps.tf-output.outputs.worker_ips }}"
+
+          echo "📋 Generated Inventory:"
+          cat ansible/inventory-workers.ini
+
+      - name: Run Ansible to Join Worker(s)
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook -i ansible/inventory-workers.ini ansible/join-worker.yml \
+            -e "master_private_ip=${{ steps.tf-output.outputs.master_private_ip }}"
+
+      - name: Summary
+        run: |
+          echo "## ✅ Worker Node Added Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| New Worker | \`brix-k3s-worker-${{ steps.create.outputs.new_count }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Instance Type | t3.medium |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Workers | ${{ steps.create.outputs.new_count }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Master IP | ${{ steps.tf-output.outputs.master_public_ip }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Worker IPs" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.tf-output.outputs.worker_ips }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
