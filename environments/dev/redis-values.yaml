@@ -3,6 +3,10 @@
 # ============================================
 # Chart: https://github.com/bitnami/charts/tree/main/bitnami/redis
 
+image:
+  repository: bitnami/redis
+  tag: 7.4
+
 # -- Disable auth for dev simplicity
 auth:
   enabled: false
@@ -26,3 +30,6 @@ master:
 
 metrics:
   enabled: false
+  image:
+    repository: bitnami/redis-exporter
+    tag: latest
