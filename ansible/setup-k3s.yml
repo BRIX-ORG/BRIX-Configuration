@@ -28,20 +28,23 @@
       retries: 10
       delay: 5
 
-    - name: Ensure ArgoCD namespace exists
-      shell: k3s kubectl create namespace argocd --dry-run=client -o yaml | k3s kubectl apply -f -
-
-    - name: Install ArgoCD
-      shell: k3s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --server-side --force-conflicts
-
-    - name: Wait for ArgoCD server deployment to be available
-      shell: k3s kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
-
-    - name: Disable ArgoCD internal TLS (serve HTTP only)
+    - name: Ensure app namespaces exist
       shell: |
-        k3s kubectl -n argocd patch configmap argocd-cmd-params-cm --type merge -p '{"data":{"server.insecure":"true"}}'
-        k3s kubectl -n argocd rollout restart deployment argocd-server
-        k3s kubectl -n argocd rollout status deployment argocd-server --timeout=120s
+        k3s kubectl create namespace brix-dev --dry-run=client -o yaml | k3s kubectl apply -f -
+        k3s kubectl create namespace brix-prod --dry-run=client -o yaml | k3s kubectl apply -f -
+
+    - name: Create Docker Registry Secret (regcred)
+      shell: |
+        k3s kubectl create secret docker-registry regcred \
+          --docker-server=https://index.docker.io/v1/ \
+          --docker-username="{{ lookup('env', 'DOCKERHUB_USERNAME') }}" \
+          --docker-password="{{ lookup('env', 'DOCKERHUB_PASSWORD') }}" \
+          --docker-email="{{ lookup('env', 'DOCKERHUB_EMAIL') }}" \
+          -n {{ item }} --dry-run=client -o yaml | k3s kubectl apply -f -
+      loop:
+        - brix-dev
+        - brix-prod
+      when: lookup('env', 'DOCKERHUB_USERNAME') != ""
 
     - name: Add GitHub PAT Secret for ArgoCD (Private Repository Access)
       shell: |

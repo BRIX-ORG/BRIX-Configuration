@@ -26,6 +26,9 @@ ingress:
           pathType: Prefix
   tls: []
 
+imagePullSecrets:
+  - name: regcred
+
 resources:
   requests:
     cpu: 500m

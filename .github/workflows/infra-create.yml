@@ -64,3 +64,6 @@ jobs:
           ansible-playbook -i ansible/inventory.ini ansible/setup-k3s.yml
         env:
           GITHUB_PAT: ${{ secrets.CONFIG_REPO_PAT }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_ACTOKEN }}
+          DOCKERHUB_EMAIL: ${{ secrets.DOCKERHUB_EMAIL }}

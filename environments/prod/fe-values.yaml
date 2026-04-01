@@ -36,6 +36,9 @@ ingress:
   #     hosts:
   #       - brix.social
 
+imagePullSecrets:
+  - name: regcred
+
 resources:
   requests:
     cpu: 200m
