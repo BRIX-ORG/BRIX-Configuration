@@ -1,0 +1,66 @@
+name: infrastructure-create-and-bootstrap
+on:
+  workflow_dispatch:
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '~1.10'
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get Public IP
+        id: tf-output
+        run: |
+            IP=$(terraform output -raw public_ip)
+            echo "new_ip=${IP}" >> $GITHUB_OUTPUT
+        working-directory: ./terraform
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Configure SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Update DNS on Name.com
+        run: |
+          pip install requests
+          python scripts/update_dns.py
+        env:
+          NAME_COM_USERNAME: ${{ secrets.NAME_COM_USERNAME }}
+          NAME_COM_TOKEN: ${{ secrets.NAME_COM_TOKEN }}
+          NEW_IP: ${{ steps.tf-output.outputs.new_ip }}
+          DOMAIN_NAME: 'brix.social'
+
+      - name: Render Dynamic Inventory
+        run: |
+          sed -i "s/YOUR_IP/${{ steps.tf-output.outputs.new_ip }}/g" ansible/inventory.ini
+
+      - name: Run Ansible Playbook to Install K3s & ArgoCD
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook -i ansible/inventory.ini ansible/setup-k3s.yml
+        env:
+          GITHUB_PAT: ${{ secrets.CONFIG_REPO_PAT }}

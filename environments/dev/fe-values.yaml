@@ -1,7 +1,7 @@
 # ============================================
 # BRIX Frontend - DEV Environment
 # ============================================
-
+# -- Number of replica pods
 replicaCount: 1
 
 image:
@@ -20,7 +20,7 @@ ingress:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
   hosts:
-    - host: app-dev.brix.example.com
+    - host: dev.brix.social
       paths:
         - path: /
           pathType: Prefix
@@ -40,5 +40,5 @@ autoscaling:
 env:
   NODE_ENV: "development"
   # -- FE calls BE via K8s internal DNS (server-side only)
-  NEXT_PUBLIC_API_URL: ""
+  NEXT_PUBLIC_API_URL: "http://api.dev.brix.social"
   INTERNAL_API_URL: "http://brix-be.brix-dev.svc.cluster.local:3000"

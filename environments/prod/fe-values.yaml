@@ -2,7 +2,7 @@
 # BRIX Frontend - PROD Environment
 # ============================================
 
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-web
@@ -24,14 +24,14 @@ ingress:
     # -- Uncomment if using cert-manager
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
-    - host: app.brix.example.com
+    - host: brix.social
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: brix-fe-tls
       hosts:
-        - app.brix.example.com
+        - brix.social
 
 resources:
   requests:
@@ -50,5 +50,5 @@ autoscaling:
 
 env:
   NODE_ENV: "production"
-  NEXT_PUBLIC_API_URL: ""
+  NEXT_PUBLIC_API_URL: "https://api.brix.social"
   INTERNAL_API_URL: "http://brix-be.brix-prod.svc.cluster.local:3000"

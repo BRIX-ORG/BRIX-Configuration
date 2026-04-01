@@ -2,7 +2,7 @@
 # BRIX Backend - PROD Environment
 # ============================================
 
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-server
@@ -15,7 +15,16 @@ service:
   targetPort: 3000
 
 ingress:
-  enabled: false
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  hosts:
+    - host: api.brix.social
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
 
 resources:
   requests:

@@ -1,0 +1,64 @@
+---
+- name: Setup K3s and ArgoCD on AWS EC2
+  hosts: all
+  become: yes
+  vars:
+    k3s_version: "v1.30.2+k3s1"
+
+  tasks:
+    - name: Wait for server to finish booting
+      wait_for_connection:
+        timeout: 300
+
+    - name: Ensure curl is installed
+      apt:
+        name: curl
+        state: present
+        update_cache: yes
+
+    - name: Install K3s
+      shell: curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - server --write-kubeconfig-mode 644
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Wait for K3s node to be ready
+      shell: k3s kubectl get nodes | grep " Ready"
+      register: k3s_ready
+      until: k3s_ready.rc == 0
+      retries: 10
+      delay: 5
+
+    - name: Create ArgoCD namespace
+      shell: k3s kubectl create namespace argocd
+      ignore_errors: yes
+
+    - name: Install ArgoCD
+      shell: k3s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+    - name: Wait for ArgoCD server deployment to be available
+      shell: k3s kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
+
+    - name: Add GitHub PAT Secret for ArgoCD (Private Repository Access)
+      shell: |
+        cat <<EOF | k3s kubectl apply -f -
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: github-repo-creds
+          namespace: argocd
+          labels:
+            argocd.argoproj.io/secret-type: repository
+        stringData:
+          url: "https://github.com/BRIX-ORG/BRIX-Configuration.git"
+          password: "{{ lookup('env', 'GITHUB_PAT') }}"
+          username: "git"
+        EOF
+      when: lookup('env', 'GITHUB_PAT') != ""
+
+    - name: Copy root-app.yaml to server
+      copy:
+        src: ../root-app.yaml
+        dest: /tmp/root-app.yaml
+
+    - name: Deploy the ArgoCD Root Application
+      shell: k3s kubectl apply -f /tmp/root-app.yaml

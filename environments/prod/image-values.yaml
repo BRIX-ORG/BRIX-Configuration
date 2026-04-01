@@ -2,7 +2,7 @@
 # BRIX Image Service - PROD Environment
 # ============================================
 
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-vision
