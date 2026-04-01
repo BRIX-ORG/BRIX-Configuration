@@ -25,12 +25,15 @@ jobs:
       - name: Get Current Worker Count
         id: current
         run: |
-          COUNT=$(terraform output -raw worker_count 2>/dev/null || echo "0")
-          echo "count=${COUNT}" >> $GITHUB_OUTPUT
+          COUNT=$(terraform output -raw worker_count 2>/dev/null || true)
+          if ! [[ "$COUNT" =~ ^[0-9]+$ ]]; then
+            COUNT=0
+          fi
           if [ "${COUNT}" = "0" ]; then
             echo "❌ No workers to remove!"
             exit 1
           fi
+          echo "count=${COUNT}" >> $GITHUB_OUTPUT
           echo "📊 Current worker count: ${COUNT}"
         working-directory: ./terraform/workers
         env:

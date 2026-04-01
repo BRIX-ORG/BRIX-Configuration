@@ -25,7 +25,11 @@ jobs:
       - name: Get Current Worker Count
         id: current
         run: |
-          COUNT=$(terraform output -raw worker_count 2>/dev/null || echo "0")
+          COUNT=$(terraform output -raw worker_count 2>/dev/null || true)
+          # First run: no state yet, output returns warning text instead of number
+          if ! [[ "$COUNT" =~ ^[0-9]+$ ]]; then
+            COUNT=0
+          fi
           echo "count=${COUNT}" >> $GITHUB_OUTPUT
           echo "📊 Current worker count: ${COUNT}"
         working-directory: ./terraform/workers
