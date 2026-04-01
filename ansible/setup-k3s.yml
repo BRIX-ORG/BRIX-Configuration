@@ -33,7 +33,7 @@
       ignore_errors: yes
 
     - name: Install ArgoCD
-      shell: k3s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      shell: k3s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --server-side --force-conflicts
 
     - name: Wait for ArgoCD server deployment to be available
       shell: k3s kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
