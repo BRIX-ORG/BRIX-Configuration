@@ -1,0 +1,84 @@
+# -- Default values for BRIX Backend (NestJS)
+# -- Override per environment in environments/{env}/be-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/brix-org/brix-server
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+# -- No ingress for BE (internal only)
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -- Non-sensitive environment variables
+env:
+  NODE_ENV: "production"
+  PORT: "3000"
+
+# -- Sensitive environment variables (stored in Secret)
+secretEnv:
+  DATABASE_URL: ""
+  REDIS_URL: ""
+  MINIO_ENDPOINT: ""
+  MINIO_ACCESS_KEY: ""
+  MINIO_SECRET_KEY: ""
+  JWT_SECRET: ""
+  JWT_REFRESH_SECRET: ""
+  SENDGRID_API_KEY: ""
+  CLOUDINARY_URL: ""
+  ALGOLIA_APP_ID: ""
+  ALGOLIA_API_KEY: ""
+  FIREBASE_PROJECT_ID: ""
+
+# -- Database migration job
+migration:
+  enabled: false
+  command: ["pnpm", "prisma:migrate"]
+
+probes:
+  liveness:
+    path: /api/health
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /api/health
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+podAnnotations: {}
+podLabels: {}

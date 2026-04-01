@@ -1,0 +1,32 @@
+# ============================================
+# ArgoCD AppProject - DEV
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: brix-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: dev
+spec:
+  description: BRIX Platform - Development Environment
+
+  # -- Source repos allowed
+  sourceRepos:
+    - https://github.com/BRIX-ORG/BRIX-Configuration.git
+    - https://charts.bitnami.com/bitnami
+
+  # -- Destination clusters/namespaces allowed
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: brix-dev
+
+  # -- Allow all resource types
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # -- Allow orphaned resources (Bitnami charts create extra resources)
+  orphanedResources:
+    warn: true

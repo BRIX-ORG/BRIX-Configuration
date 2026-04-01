@@ -1,0 +1,12 @@
+apiVersion: v2
+name: brix-be
+description: BRIX Backend - NestJS Application
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - brix
+  - backend
+  - nestjs
+maintainers:
+  - name: BRIX Team

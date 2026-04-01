@@ -1,0 +1,56 @@
+# ============================================
+# BRIX Backend - DEV Environment
+# ============================================
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/brix-org/brix-server
+  tag: "dev-latest"
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+
+migration:
+  enabled: true
+  command: ["pnpm", "prisma:migrate"]
+
+env:
+  NODE_ENV: "development"
+  PORT: "3000"
+  IMAGE_SERVICE_URL: "http://brix-image-service.brix-dev.svc.cluster.local:5000"
+
+# -- IMPORTANT: Replace these with real values
+# -- Do NOT commit real secrets to git
+# -- Use: kubectl create secret generic brix-be-secrets -n brix-dev --from-env-file=.env
+secretEnv:
+  DATABASE_URL: "postgresql://brix:changeme@brix-postgres-postgresql.brix-dev.svc.cluster.local:5432/brix_dev"
+  REDIS_URL: "redis://brix-redis-master.brix-dev.svc.cluster.local:6379"
+  MINIO_ENDPOINT: "brix-minio.brix-dev.svc.cluster.local"
+  MINIO_PORT: "9000"
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin"
+  JWT_SECRET: "dev-jwt-secret-change-me"
+  JWT_REFRESH_SECRET: "dev-jwt-refresh-secret-change-me"
+  SENDGRID_API_KEY: ""
+  CLOUDINARY_URL: ""
+  ALGOLIA_APP_ID: ""
+  ALGOLIA_API_KEY: ""
+  FIREBASE_PROJECT_ID: ""

@@ -1,0 +1,56 @@
+# ============================================
+# PostgreSQL - PROD Environment (Bitnami Chart)
+# ============================================
+
+auth:
+  postgresPassword: "CHANGE_ME_POSTGRES_ADMIN"
+  username: "brix"
+  password: "CHANGE_ME_BRIX_USER"
+  database: "brix_prod"
+
+# -- Enable replication for prod
+architecture: replication
+
+primary:
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: "local-path"
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+readReplicas:
+  replicaCount: 1
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: "local-path"
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# -- Backup configuration
+backup:
+  enabled: false
+  # -- Configure CronJob for pg_dump if needed
+
+metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi

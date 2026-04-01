@@ -1,0 +1,38 @@
+# ============================================
+# BRIX Image Service - DEV Environment
+# ============================================
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/brix-org/brix-image-service
+  tag: "dev-latest"
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+
+env:
+  FLASK_ENV: "development"
+  PORT: "5000"
+
+secretEnv:
+  MINIO_ENDPOINT: "brix-minio.brix-dev.svc.cluster.local:9000"
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin"

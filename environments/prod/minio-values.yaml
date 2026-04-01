@@ -1,0 +1,31 @@
+# ============================================
+# MinIO - PROD Environment (Bitnami Chart)
+# ============================================
+
+auth:
+  rootUser: "CHANGE_ME_MINIO_ROOT"
+  rootPassword: "CHANGE_ME_MINIO_PASSWORD"
+
+mode: standalone
+
+persistence:
+  enabled: true
+  size: 50Gi
+  storageClass: "local-path"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+# -- No public access
+apiIngress:
+  enabled: false
+
+ingress:
+  enabled: false
+
+defaultBuckets: "brix-uploads,brix-avatars,brix-media"

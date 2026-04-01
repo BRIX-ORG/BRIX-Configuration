@@ -1,0 +1,49 @@
+# ============================================
+# Redis - PROD Environment (Bitnami Chart)
+# ============================================
+
+auth:
+  enabled: true
+  password: "CHANGE_ME_REDIS_PASSWORD"
+
+# -- Enable replication for prod
+architecture: replication
+
+master:
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClass: "local-path"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+replica:
+  replicaCount: 1
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClass: "local-path"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi

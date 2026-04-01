@@ -1,0 +1,11 @@
+apiVersion: v2
+name: brix-redis-commander
+description: Redis Commander - Redis Web UI (dev only)
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - redis-commander
+  - devtool
+maintainers:
+  - name: BRIX Team

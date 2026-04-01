@@ -1,0 +1,44 @@
+# ============================================
+# Redis Commander - DEV Environment ONLY
+# ============================================
+# Chart: https://github.com/joeferner/redis-commander
+# Image: ghcr.io/joeferner/redis-commander
+
+# -- Only enabled in dev
+enabled: true
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/joeferner/redis-commander
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8081
+  targetPort: 8081
+
+# -- Expose via Traefik for dev debugging (optional)
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  hosts:
+    - host: redis-dev.brix.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+env:
+  REDIS_HOSTS: "local:brix-redis-master.brix-dev.svc.cluster.local:6379"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi

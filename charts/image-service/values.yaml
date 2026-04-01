@@ -1,0 +1,69 @@
+# -- Default values for BRIX Image Service (Flask)
+# -- Override per environment in environments/{env}/image-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/brix-org/brix-image-service
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+# -- No ingress for image service (internal only)
+ingress:
+  enabled: false
+
+# -- Higher resources for image processing
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  FLASK_ENV: "production"
+  PORT: "5000"
+
+secretEnv:
+  MINIO_ENDPOINT: ""
+  MINIO_ACCESS_KEY: ""
+  MINIO_SECRET_KEY: ""
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+podAnnotations: {}
+podLabels: {}

@@ -1,0 +1,57 @@
+# ============================================
+# ArgoCD App-of-Apps (Root Application)
+# ============================================
+# This root app watches the apps/ directory and
+# auto-creates all child ArgoCD Applications.
+#
+# Usage:
+#   kubectl apply -f root-app.yaml
+#
+# This creates TWO root apps: one for dev, one for prod.
+# ============================================
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-root-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: dev
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BRIX-ORG/BRIX-Configuration.git
+    targetRevision: main
+    path: apps/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-root-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: prod
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BRIX-ORG/BRIX-Configuration.git
+    targetRevision: main
+    path: apps/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    # -- Prod root app: manual sync for safety
+    automated:
+      prune: false
+      selfHeal: false

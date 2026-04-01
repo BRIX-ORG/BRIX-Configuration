@@ -1,0 +1,38 @@
+# ============================================
+# ArgoCD Application - Frontend (DEV)
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-fe-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: dev
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: brix-dev
+  source:
+    repoURL: https://github.com/BRIX-ORG/BRIX-Configuration.git
+    targetRevision: main
+    path: charts/fe
+    helm:
+      valueFiles:
+        - ../../environments/dev/fe-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: brix-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

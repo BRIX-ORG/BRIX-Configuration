@@ -1,0 +1,39 @@
+# ============================================
+# ArgoCD AppProject - PROD
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: brix-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: prod
+spec:
+  description: BRIX Platform - Production Environment
+
+  # -- Source repos allowed
+  sourceRepos:
+    - https://github.com/BRIX-ORG/BRIX-Configuration.git
+    - https://charts.bitnami.com/bitnami
+
+  # -- Destination clusters/namespaces allowed
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: brix-prod
+
+  # -- Allow all resource types
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # -- Strict orphaned resource monitoring in prod
+  orphanedResources:
+    warn: true
+
+  # -- Restrict who can sync in prod (optional: configure RBAC)
+  # roles:
+  #   - name: prod-deployer
+  #     description: Can sync prod applications
+  #     policies:
+  #       - p, proj:brix-prod:prod-deployer, applications, sync, brix-prod/*, allow

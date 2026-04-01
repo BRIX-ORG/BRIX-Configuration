@@ -1,0 +1,71 @@
+# Real secret values (use .example versions instead)
+environments/**/secrets.yaml
+environments/**/secrets-*.yaml
+**/secret-values.yaml
+**/secret-values-*.yaml
+
+# Kubernetes secret manifests with real data
+**/sealed-secrets/
+**/secrets/
+
+# Private keys & certificates
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*.jks
+
+# Kubeconfig & cloud credentials
+kubeconfig
+kubeconfig.*
+.kube/
+*.kubeconfig
+
+# Terraform state (if colocated)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Cloud provider credentials
+.aws/
+.gcp/
+credentials.json
+service-account*.json
+
+# Helm chart dependencies (downloaded)
+charts/*/charts/
+charts/**/Chart.lock
+
+# Helm package output
+*.tgz
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
+.npm/
+
+# Misc
+tmp/
+.tmp/
+*.log
+*.bak
+*.orig
+
+# IMPORTANT: Keep .example files tracked!
+# .example files are templates for real configs
+# They MUST be committed to git
+!*.example
+!*.example.*
+!**/*.example
+!**/*.example.*

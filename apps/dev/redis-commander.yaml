@@ -1,0 +1,37 @@
+# ============================================
+# ArgoCD Application - Redis Commander (DEV ONLY)
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-redis-commander-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: dev
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: brix-dev
+  source:
+    repoURL: https://github.com/BRIX-ORG/BRIX-Configuration.git
+    targetRevision: main
+    path: charts/redis-commander
+    helm:
+      valueFiles:
+        - ../../environments/dev/redis-commander-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: brix-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

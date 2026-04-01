@@ -1,0 +1,36 @@
+# ============================================
+# ArgoCD Application - Image Service (PROD)
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-image-service-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: prod
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: brix-prod
+  source:
+    repoURL: https://github.com/BRIX-ORG/BRIX-Configuration.git
+    targetRevision: main
+    path: charts/image-service
+    helm:
+      valueFiles:
+        - ../../environments/prod/image-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: brix-prod
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

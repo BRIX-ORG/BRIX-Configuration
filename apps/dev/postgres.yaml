@@ -1,0 +1,40 @@
+# ============================================
+# ArgoCD Application - PostgreSQL (DEV)
+# Uses Bitnami Helm chart
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-postgres-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: dev
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: brix-dev
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: 16.*.*
+    helm:
+      releaseName: brix-postgres
+      valueFiles: []
+      values: |
+        {{- .Files.Get "../../environments/dev/postgres-values.yaml" }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: brix-dev
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

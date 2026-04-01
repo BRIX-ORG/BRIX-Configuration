@@ -1,0 +1,40 @@
+# ============================================
+# ArgoCD Application - MinIO (PROD)
+# Uses Bitnami Helm chart
+# ============================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brix-minio-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: brix
+    environment: prod
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: brix-prod
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: minio
+    targetRevision: 14.*.*
+    helm:
+      releaseName: brix-minio
+      valueFiles: []
+      values: |
+        {{- .Files.Get "../../environments/prod/minio-values.yaml" }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: brix-prod
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

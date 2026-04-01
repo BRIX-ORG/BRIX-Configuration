@@ -1,0 +1,60 @@
+# ============================================
+# BRIX Backend - PROD Environment
+# ============================================
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/brix-org/brix-server
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 80
+
+migration:
+  enabled: true
+  command: ["pnpm", "prisma:migrate"]
+
+env:
+  NODE_ENV: "production"
+  PORT: "3000"
+  IMAGE_SERVICE_URL: "http://brix-image-service.brix-prod.svc.cluster.local:5000"
+
+# -- IMPORTANT: In production, use Sealed Secrets or External Secrets
+# -- Do NOT store real production secrets here
+# -- These are placeholders only
+secretEnv:
+  DATABASE_URL: "postgresql://brix:CHANGE_ME@brix-postgres-postgresql.brix-prod.svc.cluster.local:5432/brix_prod"
+  REDIS_URL: "redis://:CHANGE_ME@brix-redis-master.brix-prod.svc.cluster.local:6379"
+  MINIO_ENDPOINT: "brix-minio.brix-prod.svc.cluster.local"
+  MINIO_PORT: "9000"
+  MINIO_ACCESS_KEY: "CHANGE_ME"
+  MINIO_SECRET_KEY: "CHANGE_ME"
+  JWT_SECRET: "CHANGE_ME"
+  JWT_REFRESH_SECRET: "CHANGE_ME"
+  SENDGRID_API_KEY: "CHANGE_ME"
+  CLOUDINARY_URL: "CHANGE_ME"
+  ALGOLIA_APP_ID: "CHANGE_ME"
+  ALGOLIA_API_KEY: "CHANGE_ME"
+  FIREBASE_PROJECT_ID: "CHANGE_ME"

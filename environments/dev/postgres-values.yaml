@@ -1,0 +1,31 @@
+# ============================================
+# PostgreSQL - DEV Environment (Bitnami Chart)
+# ============================================
+# Chart: https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+
+auth:
+  postgresPassword: "changeme"
+  username: "brix"
+  password: "changeme"
+  database: "brix_dev"
+
+primary:
+  persistence:
+    enabled: true
+    size: 5Gi
+    # -- K3s default storage class: local-path
+    storageClass: "local-path"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# -- Disable replication for dev
+architecture: standalone
+
+metrics:
+  enabled: false
