@@ -3,8 +3,7 @@
 # ============================================
 
 auth:
-  enabled: true
-  password: "CHANGE_ME_REDIS_PASSWORD"
+  enabled: false
 
 # -- Enable replication for prod
 architecture: replication

@@ -47,8 +47,3 @@ autoscaling:
   maxReplicas: 5
   targetCPUUtilizationPercentage: 75
   targetMemoryUtilizationPercentage: 80
-
-env:
-  NODE_ENV: "production"
-  NEXT_PUBLIC_API_URL: "https://api.brix.social"
-  INTERNAL_API_URL: "http://brix-be.brix-prod.svc.cluster.local:3000"

@@ -48,13 +48,13 @@ env: {}
 
 probes:
   liveness:
-    path: /
+    path: /api/health
     initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 3
     failureThreshold: 3
   readiness:
-    path: /
+    path: /api/health
     initialDelaySeconds: 5
     periodSeconds: 5
     timeoutSeconds: 3

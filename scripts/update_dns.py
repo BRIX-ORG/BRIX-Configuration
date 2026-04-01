@@ -29,7 +29,7 @@ def update_name_com_dns():
         return
 
     records = response.json().get('records', [])
-    targets = ['', 'dev', 'api', 'www']  # '' is for root domain brix.social
+    targets = ['', 'dev', 'api', 'www', 'redis-dev']  # '' is for root domain brix.social
 
     for target in targets:
         # Find record ID for host

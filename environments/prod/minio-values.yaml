@@ -3,8 +3,8 @@
 # ============================================
 
 auth:
-  rootUser: "CHANGE_ME_MINIO_ROOT"
-  rootPassword: "CHANGE_ME_MINIO_PASSWORD"
+  rootUser: "minioadmin"
+  rootPassword: "minioadmin"
 
 mode: standalone
 
@@ -28,4 +28,4 @@ apiIngress:
 ingress:
   enabled: false
 
-defaultBuckets: "brix-uploads,brix-avatars,brix-media"
+defaultBuckets: "brix,brix-uploads,brix-avatars,brix-media"

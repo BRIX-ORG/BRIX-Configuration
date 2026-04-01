@@ -31,4 +31,4 @@ ingress:
   enabled: false
 
 # -- Default buckets to create
-defaultBuckets: "brix-uploads,brix-avatars,brix-media"
+defaultBuckets: "brix,brix-uploads,brix-avatars,brix-media"

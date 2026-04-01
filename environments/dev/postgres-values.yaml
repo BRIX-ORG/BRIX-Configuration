@@ -4,10 +4,10 @@
 # Chart: https://github.com/bitnami/charts/tree/main/bitnami/postgresql
 
 auth:
-  postgresPassword: "changeme"
-  username: "brix"
-  password: "changeme"
-  database: "brix_dev"
+  postgresPassword: "brix_password"
+  username: "brix_user"
+  password: "brix_password"
+  database: "brix_db"
 
 primary:
   persistence:

@@ -36,9 +36,3 @@ resources:
 
 autoscaling:
   enabled: false
-
-env:
-  NODE_ENV: "development"
-  # -- FE calls BE via K8s internal DNS (server-side only)
-  NEXT_PUBLIC_API_URL: "http://api.dev.brix.social"
-  INTERNAL_API_URL: "http://brix-be.brix-dev.svc.cluster.local:3000"

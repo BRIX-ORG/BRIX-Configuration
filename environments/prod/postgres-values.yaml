@@ -3,10 +3,10 @@
 # ============================================
 
 auth:
-  postgresPassword: "CHANGE_ME_POSTGRES_ADMIN"
-  username: "brix"
-  password: "CHANGE_ME_BRIX_USER"
-  database: "brix_prod"
+  postgresPassword: "brix_password"
+  username: "brix_user"
+  password: "brix_password"
+  database: "brix_db"
 
 # -- Enable replication for prod
 architecture: replication
