@@ -28,9 +28,8 @@
       retries: 10
       delay: 5
 
-    - name: Create ArgoCD namespace
-      shell: k3s kubectl create namespace argocd
-      ignore_errors: yes
+    - name: Ensure ArgoCD namespace exists
+      shell: k3s kubectl create namespace argocd --dry-run=client -o yaml | k3s kubectl apply -f -
 
     - name: Install ArgoCD
       shell: k3s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --server-side --force-conflicts
