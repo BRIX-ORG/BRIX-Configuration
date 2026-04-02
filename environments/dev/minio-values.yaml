@@ -4,8 +4,8 @@
 # Image managed by Bitnami chart - do NOT override with bitnamilegacy
 
 auth:
-  rootUser: "brix_admin"
-  rootPassword: "brix_password"
+  rootUser: "minioadmin"
+  rootPassword: "minioadmin"
 
 persistence:
   enabled: true
