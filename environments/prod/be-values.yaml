@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-server
-  tag: ""
+  tag: "prod-e4e9eb3"
   pullPolicy: IfNotPresent
 
 service:
