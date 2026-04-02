@@ -18,13 +18,18 @@ ingress:
   enabled: true
   className: traefik
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
   hosts:
     - host: api.brix.social
       paths:
         - path: /
           pathType: Prefix
-  tls: []
+  tls:
+    - secretName: brix-be-prod-tls
+      hosts:
+        - api.brix.social
 
 imagePullSecrets:
   - name: regcred
@@ -54,10 +59,10 @@ env:
   APP_PORT: "8080"
   
   # Database Routing (Non-Secret)
-  DB_HOST: "brix-postgres-postgresql.brix-prod.svc.cluster.local"
+  DB_HOST: "brix-postgres-postgresql-primary.brix-prod.svc.cluster.local"
   DB_PORT: "5432"
   DB_DATABASE: "brix_db"
-  DATABASE_URL: "postgresql://brix_user:brix_password@brix-postgres-postgresql.brix-prod.svc.cluster.local:5432/brix_db"
+  DATABASE_URL: "postgresql://brix_user:brix_password@brix-postgres-postgresql-primary.brix-prod.svc.cluster.local:5432/brix_db"
   
   # Redis Routing
   REDIS_HOST: "brix-redis-master.brix-prod.svc.cluster.local"
