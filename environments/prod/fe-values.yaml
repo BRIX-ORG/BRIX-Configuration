@@ -27,10 +27,15 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+    - host: www.brix.social
+      paths:
+        - path: /
+          pathType: Prefix
   tls:
     - secretName: brix-fe-prod-tls
       hosts:
         - brix.social
+        - www.brix.social
 
 imagePullSecrets:
   - name: regcred
