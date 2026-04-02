@@ -1,6 +1,16 @@
 name: infrastructure-add-worker
 on:
   workflow_dispatch:
+    inputs:
+      instance_type:
+        description: "EC2 instance type for the new worker"
+        required: true
+        type: choice
+        default: "t3.medium"
+        options:
+          - t3.small
+          - t3.medium
+          - t3.large
 
 jobs:
   add-worker:
@@ -42,8 +52,11 @@ jobs:
         run: |
           NEW_COUNT=$(( ${{ steps.current.outputs.count }} + 1 ))
           echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
-          echo "🚀 Creating worker ${NEW_COUNT}..."
-          terraform apply -var="worker_count=${NEW_COUNT}" -auto-approve
+          echo "🚀 Creating worker ${NEW_COUNT} (instance type: ${{ inputs.instance_type }})..."
+          terraform apply \
+            -var="worker_count=${NEW_COUNT}" \
+            -var="instance_type=${{ inputs.instance_type }}" \
+            -auto-approve
         working-directory: ./terraform/workers
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -104,7 +117,7 @@ jobs:
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| New Worker | \`brix-k3s-worker-${{ steps.create.outputs.new_count }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Instance Type | t3.medium |" >> $GITHUB_STEP_SUMMARY
+          echo "| Instance Type | \`${{ inputs.instance_type }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Total Workers | ${{ steps.create.outputs.new_count }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Master IP | ${{ steps.tf-output.outputs.master_public_ip }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
