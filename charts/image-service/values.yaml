@@ -15,14 +15,14 @@ fullnameOverride: ""
 
 service:
   type: ClusterIP
-  port: 5000
-  targetPort: 5000
+  port: 8000
+  targetPort: 8000
 
 # -- No ingress for image service (internal only)
 ingress:
   enabled: false
 
-# -- Higher resources for image processing
+# -- Higher resources for image processing (BLIP model needs ~1GB RAM)
 resources:
   requests:
     cpu: 250m
@@ -40,7 +40,7 @@ autoscaling:
 
 env:
   FLASK_ENV: "production"
-  PORT: "5000"
+  VISION_PORT: "8000"
 
 secretEnv:
   MINIO_ENDPOINT: ""
@@ -50,16 +50,16 @@ secretEnv:
 probes:
   liveness:
     path: /health
-    initialDelaySeconds: 10
+    initialDelaySeconds: 120
     periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
+    timeoutSeconds: 10
+    failureThreshold: 5
   readiness:
     path: /health
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 5
-    failureThreshold: 3
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 5
 
 nodeSelector: {}
 tolerations: []

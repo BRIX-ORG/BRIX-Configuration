@@ -1,11 +1,7 @@
 # ============================================
 # PostgreSQL - DEV Environment (Bitnami Chart)
 # ============================================
-
-image:
-  registry: docker.io
-  repository: bitnamilegacy/postgresql
-  tag: 17.2.0-debian-12-r5
+# Image managed by Bitnami chart - do NOT override with bitnamilegacy
 
 auth:
   postgresPassword: "brix_password"
@@ -33,6 +29,3 @@ primary:
 
 metrics:
   enabled: false
-  image:
-    repository: bitnamilegacy/postgres-exporter
-    tag: latest

@@ -9,24 +9,25 @@ image:
   tag: "prod-654e1c5"
   pullPolicy: IfNotPresent
 
-livenessProbe:
-  httpGet:
+# -- Must match template structure: probes.liveness / probes.readiness
+probes:
+  liveness:
     path: /health
-    port: 5000
-  initialDelaySeconds: 120
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 5
+  readiness:
     path: /health
-    port: 5000
-  initialDelaySeconds: 60
-  periodSeconds: 10
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 5
 
 service:
   type: ClusterIP
-  port: 5000
-  targetPort: 5000
+  port: 8000
+  targetPort: 8000
 
 ingress:
   enabled: false
@@ -47,9 +48,9 @@ autoscaling:
 
 env:
   FLASK_ENV: "production"
-  PORT: "5000"
+  VISION_PORT: "8000"
 
 secretEnv:
   MINIO_ENDPOINT: "brix-minio.brix-prod.svc.cluster.local:9000"
-  MINIO_ACCESS_KEY: "CHANGE_ME"
-  MINIO_SECRET_KEY: "CHANGE_ME"
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin"
