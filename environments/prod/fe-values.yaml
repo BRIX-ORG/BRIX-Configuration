@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: jonasaugust12/brix-web
   # -- Always pin to a specific version in prod
-  tag: "prod-a98e011"
+  tag: "prod-01c77a6"
   pullPolicy: IfNotPresent
 
 service:
