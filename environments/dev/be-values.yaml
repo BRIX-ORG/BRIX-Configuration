@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-server
-  tag: "dev-ef662c8"
+  tag: "dev-298f2c7"
   pullPolicy: Always
 
 service:

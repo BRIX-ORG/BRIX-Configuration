@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-vision
-  tag: "dev-efaf72d"
+  tag: "dev-298f2c7"
   pullPolicy: Always
 
 # -- Must match template structure: probes.liveness / probes.readiness
