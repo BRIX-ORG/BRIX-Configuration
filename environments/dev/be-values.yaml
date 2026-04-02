@@ -42,7 +42,7 @@ autoscaling:
 
 migration:
   enabled: true
-  command: ["pnpm", "prisma:migrate"]
+  command: ["pnpm", "prisma:migrate:deploy"]
 
 env:
   NODE_ENV: "development"

@@ -2,15 +2,10 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "worker_count" {
-  description = "Number of K3s worker nodes to create"
-  type        = number
-  default     = 0
-}
-
-variable "instance_type" {
-  description = "EC2 instance type for worker nodes"
-  default     = "t3.medium"
+variable "worker_instance_types" {
+  description = "List of instance types for each worker node (e.g. [\"t3.large\", \"t3.medium\", \"t3.large\"])"
+  type        = list(string)
+  default     = []
 }
 
 variable "ami_id" {

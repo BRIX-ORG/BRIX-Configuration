@@ -60,7 +60,7 @@ secretEnv:
 # -- Database migration job
 migration:
   enabled: false
-  command: ["pnpm", "prisma:migrate"]
+  command: ["pnpm", "prisma:migrate:deploy"]
 
 probes:
   liveness:

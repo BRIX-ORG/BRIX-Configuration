@@ -24,7 +24,7 @@ jobs:
         continue-on-error: true
 
       - name: Terraform Destroy Workers
-        run: terraform destroy -auto-approve -var="worker_count=0"
+        run: terraform destroy -auto-approve -var='worker_instance_types=[]'
         working-directory: ./terraform/workers
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

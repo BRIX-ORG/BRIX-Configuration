@@ -1,6 +1,11 @@
 output "worker_count" {
   description = "Current number of worker nodes"
-  value       = var.worker_count
+  value       = length(var.worker_instance_types)
+}
+
+output "worker_instance_types" {
+  description = "Instance types of all worker nodes"
+  value       = var.worker_instance_types
 }
 
 output "worker_public_ips" {

@@ -17,6 +17,7 @@ auth:
   username: "brix_user"
   password: "brix_password"
   database: "brix_db"
+  replicationPassword: "brix_repl_password"
 
 # -- Enable replication for prod
 architecture: replication
