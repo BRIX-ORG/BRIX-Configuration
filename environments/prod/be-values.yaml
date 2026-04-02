@@ -6,13 +6,13 @@ replicaCount: 1
 
 image:
   repository: jonasaugust12/brix-server
-  tag: ""
+  tag: "prod-e4e9eb3"
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 3000
-  targetPort: 3000
+  port: 8080
+  targetPort: 8080
 
 ingress:
   enabled: true
@@ -50,8 +50,8 @@ migration:
 
 env:
   NODE_ENV: "production"
-  PORT: "3000"
-  APP_PORT: "3000"
+  PORT: "8080"
+  APP_PORT: "8080"
   
   # Database Routing (Non-Secret)
   DB_HOST: "brix-postgres-postgresql.brix-prod.svc.cluster.local"
@@ -71,7 +71,7 @@ env:
   MINIO_PUBLIC_URL: "http://brix-minio.brix-prod.svc.cluster.local:9000"
 
   # Vision Service Routing
-  VISION_API_URL: "http://brix-image-service.brix-prod.svc.cluster.local:5000"
-  VISION_PORT: "5000"
+  VISION_API_URL: "http://brix-image-service.brix-prod.svc.cluster.local:8000"
+  VISION_PORT: "8000"
 
 # Sensitive variables (Passwords, Tokens, Keys) are natively injected via Docker image build.

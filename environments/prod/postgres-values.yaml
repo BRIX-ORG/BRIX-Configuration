@@ -1,7 +1,16 @@
 # ============================================
 # PostgreSQL - PROD Environment (Bitnami Chart)
 # ============================================
-# Image managed by Bitnami chart - do NOT override with bitnamilegacy
+
+# -- Bypass Bitnami chart security check (bitnami/* images no longer public)
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: bitnamilegacy/postgresql
+  tag: 17.2.0-debian-12-r5
 
 auth:
   postgresPassword: "brix_password"
@@ -44,10 +53,13 @@ readReplicas:
 # -- Backup configuration
 backup:
   enabled: false
-  # -- Configure CronJob for pg_dump if needed
 
 metrics:
   enabled: true
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/postgres-exporter
+    tag: latest
   resources:
     requests:
       cpu: 50m

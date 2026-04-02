@@ -15,8 +15,8 @@ fullnameOverride: ""
 
 service:
   type: ClusterIP
-  port: 3000
-  targetPort: 3000
+  port: 8080
+  targetPort: 8080
 
 # -- No ingress for BE (internal only)
 ingress:
@@ -40,7 +40,7 @@ autoscaling:
 # -- Non-sensitive environment variables
 env:
   NODE_ENV: "production"
-  PORT: "3000"
+  PORT: "8080"
 
 # -- Sensitive environment variables (stored in Secret)
 secretEnv:

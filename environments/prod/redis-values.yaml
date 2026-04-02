@@ -1,7 +1,16 @@
 # ============================================
 # Redis - PROD Environment (Bitnami Chart)
 # ============================================
-# Image managed by Bitnami chart - do NOT override with bitnamilegacy
+
+# -- Bypass Bitnami chart security check (bitnami/* images no longer public)
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: bitnamilegacy/redis
+  tag: 7.4.2-debian-12-r4
 
 auth:
   enabled: false
@@ -40,6 +49,10 @@ replica:
 
 metrics:
   enabled: true
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis-exporter
+    tag: latest
   resources:
     requests:
       cpu: 50m

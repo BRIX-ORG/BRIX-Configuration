@@ -1,7 +1,16 @@
 # ============================================
 # MinIO - PROD Environment (Bitnami Chart)
 # ============================================
-# Image managed by Bitnami chart - do NOT override with bitnamilegacy
+
+# -- Bypass Bitnami chart security check (bitnami/* images no longer public)
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: bitnamilegacy/minio
+  tag: 2024.11.7-debian-12-r2
 
 auth:
   rootUser: "minioadmin"
